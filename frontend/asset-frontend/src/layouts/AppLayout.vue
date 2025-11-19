@@ -87,7 +87,7 @@ import { computed, ref, type Component } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import { usePermission } from '@/utils/permission'
-import { Box, CaretBottom, DataAnalysis, Expand, Fold, Memo, Setting, Tickets, UserFilled } from '@element-plus/icons-vue'
+import { Box, CaretBottom, DataAnalysis, Memo, Setting, Tickets, UserFilled } from '@element-plus/icons-vue'
 
 interface NavigationItem {
   label: string
@@ -255,10 +255,6 @@ const initials = computed(() => {
     .join('')
     .slice(0, 2)
 })
-
-const toggleSidebar = () => {
-  isSidebarCollapsed.value = !isSidebarCollapsed.value
-}
 
 const goProfile = () => {
   if (hasPermission('user:manage')) {
