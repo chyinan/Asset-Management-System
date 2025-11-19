@@ -65,11 +65,25 @@ npm run build
 
 ### 默认账号
 
-| 角色            | 账号       | 密码       | 权限说明                           |
-|----------------|-----------|-----------|------------------------------------|
-| 系统管理员     | admin     | admin123  | 拥有所有权限                       |
-| 部门管理员     | dept_admin| 123456    | 资产审批、库存操作                 |
-| 普通员工       | user1     | 123456    | 资产申请、查看                     |
+| 角色            | 账号        | 密码      | 权限说明                                         |
+|----------------|------------|----------|--------------------------------------------------|
+| 系统管理员     | admin      | admin123 | 拥有所有权限                                     |
+| 部门管理员     | dept_admin | 123456   | 资产审批、领用/归还、审计查看                   |
+| 运营负责人     | ops_lead   | 123456   | 与部门管理员相同，用于演示多账号审批            |
+| 仓库主管       | warehouse  | 123456   | 资产入库、采购、审批、领用/归还、库存维护       |
+| 审计员         | auditor    | 123456   | 审计日志查看、导出                               |
+| 普通员工       | user1      | 123456   | 资产申请、查看                                   |
+
+#### 默认角色 & 权限
+
+| 角色编码            | 说明           | 核心权限                                                       |
+|---------------------|---------------|----------------------------------------------------------------|
+| `ROLE_ADMIN`        | 系统管理员     | `asset:*`, `user:manage`, `role:manage`, `permission:view`, `audit:view` |
+| `ROLE_DEPT_ADMIN`   | 部门管理员     | `asset:view/approve/checkout/return`, `audit:view`             |
+| `ROLE_ASSET_ADMIN`  | 资产管理员     | `asset:view/stockin/checkout/return/purchase/apply/approve`, `asset:admin` |
+| `ROLE_AUDITOR`      | 审计员         | `audit:view`, `audit:export`                                   |
+| `ROLE_VENDOR_MANAGER` | 供应商管理员 | `vendor:manage`, `asset:view`                                  |
+| `ROLE_USER`         | 普通员工       | `asset:view`, `asset:apply`                                    |
 
 ---
 
