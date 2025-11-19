@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +49,14 @@ public class AssetTypeController {
     @PutMapping("/{id}")
     public ApiResponse<AssetTypeDto> update(@PathVariable Long id, @Valid @RequestBody AssetTypeDto dto) {
         return ApiResponse.success(assetTypeService.update(id, dto));
+    }
+
+    @Operation(summary = "删除资产类型")
+    @PreAuthorize("hasAuthority('asset:admin')")
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> delete(@PathVariable Long id) {
+        assetTypeService.delete(id);
+        return ApiResponse.success();
     }
 }
 
