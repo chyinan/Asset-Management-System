@@ -2,14 +2,14 @@
   <PageContainer title="资产类型库" description="规范资产分类，统一编码与配置信息" eyebrow="系统管理">
     <template #actions>
       <div class="actions">
-        <el-input
-          v-model="keyword"
-          placeholder="搜索名称或编码"
-          clearable
-          style="width: 240px"
-          :prefix-icon="Search"
-        />
-        <el-tag type="info" effect="plain">共 {{ assetTypes.length }} 类</el-tag>
+      <el-input
+        v-model="keyword"
+        placeholder="搜索名称或编码"
+        clearable
+        style="width: 240px"
+        :prefix-icon="Search"
+      />
+      <el-tag type="info" effect="plain">共 {{ assetTypes.length }} 类</el-tag>
         <el-button type="primary" @click="openCreate">新建类型</el-button>
       </div>
     </template>

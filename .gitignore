@@ -18,9 +18,6 @@ frontend/asset-frontend/.turbo/
 
 # Backend / Java
 backend/asset-backend/target/
-backend/asset-backend/.mvn/
-backend/asset-backend/mvnw
-backend/asset-backend/mvnw.cmd
 *.iml
 
 # IDE / OS

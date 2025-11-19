@@ -177,30 +177,30 @@ const kpiCards = computed(() => {
 
   if (canViewRequests.value) {
     cards.push({
-      title: '待审批申请',
-      value: metrics.pending,
-      desc: `${metrics.totalRequests} 条申请记录`,
-      statusText: metrics.pending > 5 ? '需立即处理' : '负载正常',
-      statusType: metrics.pending > 5 ? 'warning' : 'success'
+    title: '待审批申请',
+    value: metrics.pending,
+    desc: `${metrics.totalRequests} 条申请记录`,
+    statusText: metrics.pending > 5 ? '需立即处理' : '负载正常',
+    statusType: metrics.pending > 5 ? 'warning' : 'success'
     })
   }
 
   if (canViewInventory.value) {
     cards.push(
-      {
-        title: '可用库存',
-        value: metrics.inventoryAvailable,
-        desc: `总库存 ${metrics.inventoryTotal}`,
-        statusText: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? '库存充足' : '注意补货',
-        statusType: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? 'success' : 'danger'
-      },
-      {
-        title: '在途/领用',
-        value: metrics.checkoutCount,
-        desc: '当前外借资产数量',
-        statusText: metrics.checkoutCount > 0 ? '需跟进归还' : '全部在库',
-        statusType: metrics.checkoutCount > 0 ? 'info' : 'success'
-      }
+  {
+    title: '可用库存',
+    value: metrics.inventoryAvailable,
+    desc: `总库存 ${metrics.inventoryTotal}`,
+    statusText: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? '库存充足' : '注意补货',
+    statusType: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? 'success' : 'danger'
+  },
+  {
+    title: '在途/领用',
+    value: metrics.checkoutCount,
+    desc: '当前外借资产数量',
+    statusText: metrics.checkoutCount > 0 ? '需跟进归还' : '全部在库',
+    statusType: metrics.checkoutCount > 0 ? 'info' : 'success'
+  }
     )
   }
 
