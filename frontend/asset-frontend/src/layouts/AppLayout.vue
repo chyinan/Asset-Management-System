@@ -106,7 +106,7 @@ const navigationConfig: NavigationItem[] = [
     label: '库存管理',
     path: '/inventory',
     icon: Box,
-    anyOf: ['asset:stockin', 'asset:checkout']
+    permission: 'asset:stockin'
   },
   {
     label: '系统管理',

@@ -8,7 +8,7 @@
       <el-button :loading="loading" @click="refreshData">刷新数据</el-button>
     </template>
 
-    <div class="kpi-grid">
+    <div v-if="kpiCards.length" class="kpi-grid">
       <div v-for="card in kpiCards" :key="card.title" class="kpi-card surface-card">
         <div class="kpi-meta">
           <span>{{ card.title }}</span>
@@ -48,7 +48,7 @@
         </div>
       </el-card>
 
-      <el-card shadow="never" class="surface-card">
+      <el-card v-if="canViewRequests" shadow="never" class="surface-card">
         <template #header>
           <div class="panel-header">
             <div>
@@ -74,14 +74,16 @@
       </el-card>
     </div>
 
-    <div class="chart-grid">
+    <div v-if="canViewRequests || canViewInventory" class="chart-grid">
       <ChartCard
+        v-if="canViewRequests"
         title="近10日申请趋势"
         eyebrow="流程监控"
         description="掌握每日资产申请量变化"
         :option="requestTrendOption"
       />
       <ChartCard
+        v-if="canViewInventory"
         title="库存状态分布"
         eyebrow="库存结构"
         description="直观查看库存健康度"
@@ -164,29 +166,46 @@ const quickActionConfigs: QuickAction[] = [
 
 const quickActions = computed(() => quickActionConfigs.filter((item) => !item.permission || hasPermission(item.permission)))
 
-const kpiCards = computed(() => [
-  {
-    title: '待审批申请',
-    value: metrics.pending,
-    desc: `${metrics.totalRequests} 条申请记录`,
-    statusText: metrics.pending > 5 ? '需立即处理' : '负载正常',
-    statusType: metrics.pending > 5 ? 'warning' : 'success'
-  },
-  {
-    title: '可用库存',
-    value: metrics.inventoryAvailable,
-    desc: `总库存 ${metrics.inventoryTotal}`,
-    statusText: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? '库存充足' : '注意补货',
-    statusType: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? 'success' : 'danger'
-  },
-  {
-    title: '在途/领用',
-    value: metrics.checkoutCount,
-    desc: '当前外借资产数量',
-    statusText: metrics.checkoutCount > 0 ? '需跟进归还' : '全部在库',
-    statusType: metrics.checkoutCount > 0 ? 'info' : 'success'
+const kpiCards = computed(() => {
+  const cards: {
+    title: string
+    value: number
+    desc: string
+    statusText: string
+    statusType: 'primary' | 'success' | 'warning' | 'danger' | 'info'
+  }[] = []
+
+  if (canViewRequests.value) {
+    cards.push({
+      title: '待审批申请',
+      value: metrics.pending,
+      desc: `${metrics.totalRequests} 条申请记录`,
+      statusText: metrics.pending > 5 ? '需立即处理' : '负载正常',
+      statusType: metrics.pending > 5 ? 'warning' : 'success'
+    })
   }
-])
+
+  if (canViewInventory.value) {
+    cards.push(
+      {
+        title: '可用库存',
+        value: metrics.inventoryAvailable,
+        desc: `总库存 ${metrics.inventoryTotal}`,
+        statusText: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? '库存充足' : '注意补货',
+        statusType: metrics.inventoryAvailable > metrics.inventoryTotal * 0.6 ? 'success' : 'danger'
+      },
+      {
+        title: '在途/领用',
+        value: metrics.checkoutCount,
+        desc: '当前外借资产数量',
+        statusText: metrics.checkoutCount > 0 ? '需跟进归还' : '全部在库',
+        statusType: metrics.checkoutCount > 0 ? 'info' : 'success'
+      }
+    )
+  }
+
+  return cards
+})
 
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).format(
