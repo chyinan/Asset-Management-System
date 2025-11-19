@@ -5,6 +5,7 @@ import com.project.asset.dto.basic.DepartmentDto;
 import com.project.asset.exception.BusinessException;
 import com.project.asset.exception.ErrorCode;
 import com.project.asset.repository.DepartmentRepository;
+import com.project.asset.repository.UserRepository;
 import com.project.asset.response.PageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
+    private final UserRepository userRepository;
 
     public PageResponse<DepartmentDto> list(int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
@@ -49,6 +51,20 @@ public class DepartmentService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "部门不存在"));
         apply(dto, department);
         return toDto(departmentRepository.save(department));
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Department department = departmentRepository
+                .findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "部门不存在"));
+        if (departmentRepository.existsByParent_Id(id)) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "存在下级部门，无法删除");
+        }
+        if (userRepository.existsByDepartment_Id(id)) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "存在用户关联该部门，无法删除");
+        }
+        departmentRepository.delete(department);
     }
 
     public DepartmentDto findById(Long id) {

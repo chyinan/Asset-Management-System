@@ -26,6 +26,11 @@ public class PermissionController {
     public ApiResponse<List<PermissionDto>> list() {
         return ApiResponse.success(permissionService.listAll());
     }
+
+    @Operation(summary = "列出全部权限编码")
+    @PreAuthorize("hasAnyAuthority('permission:view','role:manage')")
+    @GetMapping("/codes")
+    public ApiResponse<List<String>> listCodes() {
+        return ApiResponse.success(permissionService.listCodes());
+    }
 }
-
-

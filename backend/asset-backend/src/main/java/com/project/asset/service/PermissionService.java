@@ -24,6 +24,12 @@ public class PermissionService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public List<String> listCodes() {
+        return permissionRepository.findAll().stream()
+                .map(permission -> permission.getCode())
+                .collect(Collectors.toList());
+    }
 }
 
 

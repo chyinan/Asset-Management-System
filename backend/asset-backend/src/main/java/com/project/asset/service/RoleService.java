@@ -9,6 +9,7 @@ import com.project.asset.repository.PermissionRepository;
 import com.project.asset.repository.RoleRepository;
 import com.project.asset.response.PageResponse;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -60,11 +61,13 @@ public class RoleService {
         role.setName(dto.getName());
         role.setRemark(dto.getRemark());
         if (dto.getPermissions() != null) {
-            Set<Permission> permissions = new HashSet<>(permissionRepository.findAll());
-            Set<Permission> selected = permissions.stream()
-                    .filter(p -> dto.getPermissions().contains(p.getCode()))
-                    .collect(Collectors.toSet());
-            role.setPermissions(selected);
+            List<Permission> permissions = permissionRepository.findByCodeIn(dto.getPermissions());
+            if (permissions.size() != dto.getPermissions().size()) {
+                throw new BusinessException(ErrorCode.NOT_FOUND, "权限编码不存在");
+            }
+            role.setPermissions(new HashSet<>(permissions));
+        } else {
+            role.setPermissions(new HashSet<>());
         }
     }
 

@@ -2,6 +2,7 @@ package com.project.asset.dto.rbac;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class RoleDto {
 
     private String remark;
 
+    @NotEmpty
     private Set<String> permissions;
 }
 
