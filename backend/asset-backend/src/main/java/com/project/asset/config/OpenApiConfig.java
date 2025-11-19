@@ -15,6 +15,7 @@ public class OpenApiConfig {
     public OpenAPI assetOpenAPI() {
         final String bearerScheme = "BearerAuth";
         return new OpenAPI()
+                .openapi("3.0.1")
                 .info(new Info()
                         .title("Asset Management System API")
                         .version("v1")
