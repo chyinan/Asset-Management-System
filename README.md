@@ -1,11 +1,13 @@
 ## 资产管理系统 (Asset Management System)
 
-一个覆盖资产全生命周期（申请 → 审批 → 采购 → 入库 → 领用 → 归还）的前后端分离项目，技术栈：
+一个覆盖资产全生命周期（申请 → 审批 → 采购 → 入库 → 领用 → 归还）的前后端分离项目
+
+### 技术栈
 
 - **后端**：Spring Boot 3.4、Spring Security、JJWT、Spring Data JPA、Flyway、MySQL
 - **前端**：Vue 3 + Vite + TypeScript + Element Plus + Pinia + Vue Router
 - **测试**：JUnit 5、MockMvc、Vue TSC
-- **其他**：OpenAPI(Swagger UI)、Docker、GitHub Actions（CI 示例）
+- **其他**：OpenAPI(Swagger UI)、Docker、GitHub Actions
 
 ---
 
