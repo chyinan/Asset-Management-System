@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: asset-mysql
+    environment:
+      MYSQL_DATABASE: asset
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - db_data:/var/lib/mysql
+
+  asset-backend:
+    build:
+      context: ./backend/asset-backend
+      dockerfile: Dockerfile
+    container_name: asset-backend
+    depends_on:
+      - mysql
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/asset?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+      JWT_SECRET: popcap
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
+

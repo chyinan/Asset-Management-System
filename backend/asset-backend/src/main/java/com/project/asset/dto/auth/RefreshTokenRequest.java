@@ -1,0 +1,15 @@
+package com.project.asset.dto.auth;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+
+@Data
+public class RefreshTokenRequest {
+
+    @Schema(description = "刷新令牌", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank
+    private String refreshToken;
+}
+
+

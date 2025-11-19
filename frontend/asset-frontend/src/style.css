@@ -1,0 +1,97 @@
+:root {
+  font-family: var(--ams-typography-fontFamilyBase, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+        'PingFang SC', 'Microsoft YaHei', sans-serif);
+  line-height: var(--ams-typography-lineHeights-relaxed, 1.6);
+  font-weight: var(--ams-typography-weights-regular, 400);
+  color: var(--ams-text-primary, #0f172a);
+  background-color: var(--ams-surface-body, #f7f8fb);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--ams-typography-fontFamilyBase, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+        'PingFang SC', 'Microsoft YaHei', sans-serif);
+  background: var(--ams-surface-body, #f7f8fb);
+  color: var(--ams-text-primary, #0f172a);
+}
+
+#app {
+  min-height: 100vh;
+  background: transparent;
+}
+
+a {
+  color: var(--ams-palette-primary, #4d67ff);
+  text-decoration: none;
+  transition: color var(--ams-motion-fast, 120ms ease);
+}
+
+a:hover {
+  color: var(--ams-palette-accent, #2ec9ff);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ams-palette-accent, #2ec9ff);
+  outline-offset: 2px;
+}
+
+.full-height {
+  min-height: 100vh;
+}
+
+.surface-card {
+  background: var(--ams-surface-card, #ffffff);
+  border: var(--ams-components-borderWidth, 1px) solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  border-radius: var(--ams-radius-lg, 18px);
+  box-shadow: var(--ams-shadow-soft, 0 6px 24px rgba(15, 23, 42, 0.08));
+}
+
+.surface-glass {
+  background: var(--ams-surface-glass, rgba(255, 255, 255, 0.72));
+  border-radius: var(--ams-radius-lg, 18px);
+  border: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  box-shadow: var(--ams-shadow-soft, 0 6px 24px rgba(15, 23, 42, 0.08));
+  backdrop-filter: blur(24px);
+}
+
+.text-muted {
+  color: var(--ams-text-muted, #98a2b3);
+}
+
+.gradient-hero {
+  background-image: var(--ams-gradients-hero, linear-gradient(135deg, #4d67ff 0%, #5bc4ff 100%));
+  color: var(--ams-text-inverse, #ffffff);
+}
+
+.container-shell {
+  width: 100%;
+  max-width: var(--ams-layout-contentMaxWidth, 1280px);
+  margin: 0 auto;
+  padding: 0 var(--ams-spacing-lg, 24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "info": {
+    "name": "Asset Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "4d0db0d3-8891-4d3a-a9fb-a1e5a65e2f25"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create Asset Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/asset-requests", "host": ["{{baseUrl}}"], "path": ["asset-requests"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"requesterId\": 3,\n  \"departmentId\": 1,\n  \"remark\": \"开发测试\",\n  \"items\": [\n    {\"assetTypeId\": 1, \"quantity\": 1, \"purpose\": \"项目\"}\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "Approve Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/asset-requests/{{requestId}}/approve",
+          "host": ["{{baseUrl}}"],
+          "path": ["asset-requests", "{{requestId}}", "approve"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"approverId\": 2, \"result\": \"APPROVED\", \"comment\": \"同意\" }"
+        }
+      }
+    },
+    {
+      "name": "Stock In",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": { "raw": "{{baseUrl}}/inventory/stock-in", "host": ["{{baseUrl}}"], "path": ["inventory", "stock-in"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"assetId\": 1,\n  \"serialNo\": \"SN-2025001\",\n  \"location\": \"仓库A\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Checkout Inventory",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/inventory/{{inventoryId}}/checkout",
+          "host": ["{{baseUrl}}"],
+          "path": ["inventory", "{{inventoryId}}", "checkout"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"userId\": 3, \"remark\": \"项目需要\" }"
+        }
+      }
+    },
+    {
+      "name": "Return Inventory",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/inventory/{{inventoryId}}/return",
+          "host": ["{{baseUrl}}"],
+          "path": ["inventory", "{{inventoryId}}", "return"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"userId\": 3, \"remark\": \"归还\" }"
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api" },
+    { "key": "accessToken", "value": "" },
+    { "key": "requestId", "value": "1" },
+    { "key": "inventoryId", "value": "1" }
+  ]
+}
+

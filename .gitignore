@@ -1,0 +1,35 @@
+# Node / Frontend artifacts
+node_modules/
+dist/
+.vite/
+*.log
+*.local
+.cache/
+.eslintcache
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build outputs
+frontend/asset-frontend/.temp/
+frontend/asset-frontend/.turbo/
+
+# Backend / Java
+backend/asset-backend/target/
+backend/asset-backend/.mvn/
+backend/asset-backend/mvnw
+backend/asset-backend/mvnw.cmd
+*.iml
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log.*
+

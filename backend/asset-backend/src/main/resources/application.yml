@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: asset-backend
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/asset?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+
+logging:
+  level:
+    root: INFO
+    com.project.asset: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET:please-change-me}
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION:3600}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800}
+
+
