@@ -3,7 +3,9 @@ package com.project.asset.service;
 import com.project.asset.domain.entity.Department;
 import com.project.asset.domain.entity.Role;
 import com.project.asset.domain.entity.User;
+import com.project.asset.dto.rbac.UpdateProfileRequest;
 import com.project.asset.dto.rbac.UserDto;
+import com.project.asset.dto.rbac.UserProfileDto;
 import com.project.asset.exception.BusinessException;
 import com.project.asset.exception.ErrorCode;
 import com.project.asset.repository.DepartmentRepository;
@@ -60,6 +62,10 @@ public class UserService {
         User user = userRepository
                 .findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "用户不存在"));
+        if (!user.getUsername().equals(dto.getUsername())
+                && userRepository.existsByUsernameAndIdNot(dto.getUsername(), id)) {
+            throw new BusinessException(ErrorCode.CONFLICT, "用户名已存在");
+        }
         apply(dto, user);
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -98,6 +104,34 @@ public class UserService {
                 .enabled(user.getEnabled())
                 .roles(user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()))
                 .build();
+    }
+
+    public UserProfileDto getProfile(Long userId) {
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "用户不存在"));
+        return UserProfileDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .build();
+    }
+
+    @Transactional
+    public UserProfileDto updateProfile(Long userId, UpdateProfileRequest request) {
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "用户不存在"));
+        if (!user.getUsername().equals(request.getUsername())
+                && userRepository.existsByUsernameAndIdNot(request.getUsername(), userId)) {
+            throw new BusinessException(ErrorCode.CONFLICT, "用户名已存在");
+        }
+        user.setUsername(request.getUsername());
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        userRepository.save(user);
+        return getProfile(userId);
     }
 }
 

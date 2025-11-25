@@ -36,3 +36,18 @@ export const listPermissions = () => http.get<string[]>('/permissions/codes')
 export const listAuditLogs = (params: { page?: number; size?: number }) =>
   http.get<PageResponse<AuditLog>>('/audit-logs', { params })
 
+export interface ReminderSettings {
+  senderEmail: string
+  smtpHost?: string
+  smtpPort?: number
+  smtpUsername?: string
+  smtpUseTls?: boolean
+  updatedBy?: string
+  updatedAt?: string
+}
+
+export const getReminderSettings = () => http.get<ReminderSettings>('/system/reminder-settings')
+
+export const updateReminderSettings = (payload: ReminderSettings & { smtpPassword?: string }) =>
+  http.put<ReminderSettings>('/system/reminder-settings', payload)
+

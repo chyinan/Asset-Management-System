@@ -16,5 +16,11 @@ public class InventoryDto {
     String serialNo;
     String location;
     LocalDateTime updatedAt;
+    Long currentHolderId;
+    String currentHolderName;
+    LocalDateTime checkedOutAt;
+    LocalDateTime expectedReturnAt;
+    LocalDateTime lastReminderAt;
+    Integer reminderCount;
 }
 

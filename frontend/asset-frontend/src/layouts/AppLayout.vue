@@ -87,7 +87,19 @@ import { computed, ref, type Component } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import { usePermission } from '@/utils/permission'
-import { Box, CaretBottom, DataAnalysis, Memo, Setting, Tickets, UserFilled } from '@element-plus/icons-vue'
+import {
+  Avatar,
+  Box,
+  CaretBottom,
+  Collection,
+  CollectionTag,
+  DataAnalysis,
+  Memo,
+  Message,
+  OfficeBuilding,
+  Setting,
+  Tickets
+} from '@element-plus/icons-vue'
 
 interface NavigationItem {
   label: string
@@ -112,10 +124,11 @@ const navigationConfig: NavigationItem[] = [
     label: '系统管理',
     icon: Setting,
     children: [
-      { label: '用户管理', path: '/system/users', icon: UserFilled, permission: 'user:manage' },
-      { label: '角色管理', path: '/system/roles', icon: UserFilled, permission: 'role:manage' },
-      { label: '部门管理', path: '/system/departments', icon: UserFilled, permission: 'asset:admin' },
-      { label: '资产类型', path: '/system/asset-types', icon: UserFilled, permission: 'asset:admin' }
+      { label: '用户管理', path: '/system/users', icon: Avatar, permission: 'user:manage' },
+      { label: '角色管理', path: '/system/roles', icon: CollectionTag, permission: 'role:manage' },
+      { label: '部门管理', path: '/system/departments', icon: OfficeBuilding, permission: 'asset:admin' },
+      { label: '资产类型', path: '/system/asset-types', icon: Collection, permission: 'asset:admin' },
+      { label: '提醒邮箱', path: '/system/reminder-email', icon: Message, permission: 'asset:admin' }
     ]
   },
   { label: '审计日志', path: '/audit', icon: Memo, permission: 'audit:view' }
@@ -162,6 +175,16 @@ const pageCopy: Record<
   '/system/asset-types': {
     title: '资产类型库',
     description: '规范资产分类，统一数据字典',
+    section: '系统管理'
+  },
+  '/system/reminder-email': {
+    title: '提醒邮箱设置',
+    description: '配置资产归还提醒任务使用的发件邮箱',
+    section: '系统管理'
+  },
+  '/profile': {
+    title: '个人设置',
+    description: '更新您的个人信息与邮箱',
     section: '系统管理'
   },
   '/audit': {
@@ -257,9 +280,7 @@ const initials = computed(() => {
 })
 
 const goProfile = () => {
-  if (hasPermission('user:manage')) {
-    router.push('/system/users')
-  }
+  router.push('/profile')
 }
 
 const handleLogout = async () => {
@@ -282,6 +303,7 @@ const handleLogout = async () => {
   color: #f8fbff;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   transition: width var(--ams-motion-base, 200ms ease);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   height: 100vh;
@@ -383,6 +405,7 @@ const handleLogout = async () => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   background: var(--ams-surface-body, #f7f8fb);
 }
 

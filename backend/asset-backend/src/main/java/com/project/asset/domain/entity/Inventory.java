@@ -30,6 +30,10 @@ public class Inventory {
     @JoinColumn(name = "asset_id", nullable = false)
     private Asset asset;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_holder_id")
+    private User currentHolder;
+
     @Column(name = "serial_no", length = 200, unique = true)
     private String serialNo;
 
@@ -45,6 +49,18 @@ public class Inventory {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "checked_out_at")
+    private LocalDateTime checkedOutAt;
+
+    @Column(name = "expected_return_at")
+    private LocalDateTime expectedReturnAt;
+
+    @Column(name = "last_reminder_at")
+    private LocalDateTime lastReminderAt;
+
+    @Column(name = "reminder_count")
+    private Integer reminderCount = 0;
 }
 
 

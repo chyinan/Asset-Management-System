@@ -57,10 +57,22 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, permission: 'asset:admin' }
       },
       {
+        path: 'system/reminder-email',
+        name: 'ReminderSettings',
+        component: () => import('@/views/system/ReminderSettings.vue'),
+        meta: { requiresAuth: true, permission: 'asset:admin' }
+      },
+      {
         path: 'audit',
         name: 'AuditLogs',
         component: () => import('@/views/audit/AuditLog.vue'),
         meta: { requiresAuth: true, permission: 'audit:view' }
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/profile/ProfileSettings.vue'),
+        meta: { requiresAuth: true }
       }
     ]
   },

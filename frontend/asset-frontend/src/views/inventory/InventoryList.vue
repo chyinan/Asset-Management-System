@@ -34,6 +34,16 @@
             <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="领用人" width="140">
+          <template #default="{ row }">
+            {{ row.currentHolderName || '—' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="预计归还" width="200">
+          <template #default="{ row }">
+            {{ formatDatetime(row.expectedReturnAt) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="location" label="位置" min-width="140" />
         <el-table-column label="操作" width="260" fixed="right">
           <template #default="{ row }">
@@ -210,6 +220,7 @@ const submitStockIn = async () => {
 
 const openCheckout = (row: Inventory) => {
   currentInventory.value = row
+  checkoutForm.remark = ''
   showCheckout.value = true
 }
 
@@ -228,6 +239,10 @@ const submitCheckout = async () => {
 
 const openReturn = (row: Inventory) => {
   currentInventory.value = row
+  if (row.currentHolderId) {
+    returnForm.userId = row.currentHolderId
+  }
+  returnForm.remark = ''
   showReturn.value = true
 }
 
@@ -260,6 +275,11 @@ const statusType = (status: string) => {
     SCRAPPED: 'info'
   }
   return map[status] || 'info'
+}
+
+const formatDatetime = (value?: string) => {
+  if (!value) return '—'
+  return new Date(value).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 onMounted(fetchData)

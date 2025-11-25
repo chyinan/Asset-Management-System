@@ -46,6 +46,12 @@ export interface Inventory {
   serialNo: string
   status: string
   location?: string
+  currentHolderId?: number
+  currentHolderName?: string
+  checkedOutAt?: string
+  expectedReturnAt?: string
+  lastReminderAt?: string
+  reminderCount?: number
 }
 
 export interface AuditLog {

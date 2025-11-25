@@ -20,6 +20,17 @@ spring:
     baseline-on-migrate: true
   jackson:
     default-property-inclusion: non_null
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:25}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:false}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:false}
 
 server:
   port: ${SERVER_PORT:8080}
@@ -33,5 +44,13 @@ jwt:
   secret: ${JWT_SECRET:please-change-me}
   access-token-expiration: ${JWT_ACCESS_EXPIRATION:3600}
   refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800}
+
+asset:
+  loan:
+    reminder-enabled: ${ASSET_LOAN_REMINDER_ENABLED:true}
+    default-duration-days: ${ASSET_LOAN_DEFAULT_DAYS:30}
+    reminder-cron: ${ASSET_LOAN_REMINDER_CRON:0 0 9 ? * MON}
+    reminder-email-from: ${ASSET_LOAN_EMAIL_FROM:no-reply@asset.local}
+    reminder-cooldown-days: ${ASSET_LOAN_REMINDER_COOLDOWN_DAYS:7}
 
 

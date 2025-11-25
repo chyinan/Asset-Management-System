@@ -1,5 +1,6 @@
 package com.project.asset.service;
 
+import com.project.asset.config.LoanReminderProperties;
 import com.project.asset.domain.entity.Asset;
 import com.project.asset.domain.entity.CheckoutRecord;
 import com.project.asset.domain.entity.Inventory;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class InventoryService {
     private final CheckoutRecordRepository checkoutRecordRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
+    private final LoanReminderProperties loanReminderProperties;
 
     public PageResponse<InventoryDto> list(int page, int size, String sort) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).descending());
@@ -79,8 +82,14 @@ public class InventoryService {
         User user = userRepository
                 .findById(dto.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "用户不存在"));
+        LocalDateTime now = LocalDateTime.now();
         inventory.setStatus(InventoryStatus.CHECKED_OUT);
-        inventory.setUpdatedAt(LocalDateTime.now());
+        inventory.setUpdatedAt(now);
+        inventory.setCurrentHolder(user);
+        inventory.setCheckedOutAt(now);
+        inventory.setExpectedReturnAt(determineExpectedReturnAt(now, dto.getExpectedReturnAt()));
+        inventory.setLastReminderAt(null);
+        inventory.setReminderCount(0);
         inventoryRepository.save(inventory);
         writeCheckoutRecord(inventory, user, CheckoutType.CHECKOUT, dto.getRemark());
         auditService.record(user.getId(), "CHECKOUT", "Inventory", inventoryId, dto.getRemark());
@@ -98,8 +107,18 @@ public class InventoryService {
         User user = userRepository
                 .findById(dto.getUserId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "用户不存在"));
+        if (inventory.getCurrentHolder() != null
+                && !inventory.getCurrentHolder().getId().equals(user.getId())) {
+            throw new BusinessException(ErrorCode.CONFLICT, "归还人需与当前领用人一致");
+        }
+        LocalDateTime now = LocalDateTime.now();
         inventory.setStatus(InventoryStatus.IN_STOCK);
-        inventory.setUpdatedAt(LocalDateTime.now());
+        inventory.setUpdatedAt(now);
+        inventory.setCurrentHolder(null);
+        inventory.setCheckedOutAt(null);
+        inventory.setExpectedReturnAt(null);
+        inventory.setLastReminderAt(null);
+        inventory.setReminderCount(0);
         inventoryRepository.save(inventory);
         writeCheckoutRecord(inventory, user, CheckoutType.RETURN, dto.getRemark());
         auditService.record(user.getId(), "RETURN", "Inventory", inventoryId, dto.getRemark());
@@ -126,7 +145,34 @@ public class InventoryService {
                 .status(inventory.getStatus())
                 .location(inventory.getLocation())
                 .updatedAt(inventory.getUpdatedAt())
+                .currentHolderId(
+                        inventory.getCurrentHolder() != null ? inventory.getCurrentHolder().getId() : null)
+                .currentHolderName(resolveHolderName(inventory.getCurrentHolder()))
+                .checkedOutAt(inventory.getCheckedOutAt())
+                .expectedReturnAt(inventory.getExpectedReturnAt())
+                .lastReminderAt(inventory.getLastReminderAt())
+                .reminderCount(inventory.getReminderCount())
                 .build();
+    }
+
+    private LocalDateTime determineExpectedReturnAt(LocalDateTime now, LocalDateTime expectedReturnAt) {
+        if (expectedReturnAt != null) {
+            if (expectedReturnAt.isBefore(now)) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "预计归还时间必须晚于当前时间");
+            }
+            return expectedReturnAt;
+        }
+        return now.plusDays(loanReminderProperties.getDefaultDurationDays());
+    }
+
+    private String resolveHolderName(User user) {
+        if (user == null) {
+            return null;
+        }
+        if (StringUtils.hasText(user.getFullName())) {
+            return user.getFullName();
+        }
+        return user.getUsername();
     }
 }
 
