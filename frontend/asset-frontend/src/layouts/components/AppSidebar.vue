@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import type { NavigationItem } from '@/config/menu'
 
-const props = defineProps<{
+defineProps<{
   menuItems: NavigationItem[]
   collapsed: boolean
   activeRoute: string

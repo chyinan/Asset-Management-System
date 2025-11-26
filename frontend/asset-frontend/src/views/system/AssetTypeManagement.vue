@@ -59,7 +59,6 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import PageContainer from '@/components/common/PageContainer.vue'
 import { createAssetType, deleteAssetType, listAssetTypes, updateAssetType } from '@/api/modules/basic'
 import type { AssetType } from '@/types/domain'
-import { useDevice } from '@/composables/useDevice'
 import { Search } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -71,7 +70,6 @@ const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'edit'>('create')
 const saving = ref(false)
 const formRef = ref<FormInstance>()
-const { isMobile } = useDevice()
 const formModel = reactive({
   id: 0,
   name: '',

@@ -120,7 +120,7 @@ type DateRange = [Date, Date] | null
 const logs = ref<AuditLog[]>([])
 const loading = ref(false)
 const keyword = ref('')
-const actionFilter = ref<string>('') // Fix: Initialize as empty string
+const actionFilter = ref<string>('')
 const filterStart = ref<Date | null>(null)
 const filterEnd = ref<Date | null>(null)
 
@@ -131,7 +131,7 @@ const dateRange = computed<DateRange>({
     }
     return null
   },
-  set: (val) => {
+  set: (val: DateRange) => {
     if (val) {
       filterStart.value = val[0]
       filterEnd.value = val[1]
