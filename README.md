@@ -25,7 +25,7 @@ README.md                 # 当前文档
 
 ### 快速开始
 
-#### 1. 启动数据库 + 后端 + 前端（推荐 Docker）
+#### 1. 自动启动数据库 + 后端 + 前端（推荐 Docker）
 
 ```bash
 cp docker/.env.example .env           # 可选，覆盖默认环境
@@ -34,7 +34,9 @@ docker compose up -d                  # 启动 mysql + backend + frontend
 # 后端将监听 0.0.0.0:8080
 ```
 
-手动方式：
+#### 2. 手动方式：
+
+手动启动后端方法1（mvnw）：
 
 ```bash
 cd backend/asset-backend
@@ -46,7 +48,7 @@ cd backend/asset-backend
     -DJWT_SECRET=popcap"
 ```
 
-手动方式（IntelliJ IDEA）：
+手动启动后端方法2（IntelliJ IDEA）：
 
 1. **导入项目**：打开 IDEA，选择 `Open`，指向 `backend/asset-backend` 目录（识别为 Maven 项目）。
 2. **配置数据库**：确保本地 MySQL 已启动（端口 3306，账号 root/123456）且存在 `asset` 库。
@@ -56,7 +58,7 @@ cd backend/asset-backend
 
 Flyway 会在首次启动时自动创建并初始化数据库（含种子数据、角色、权限、示例资产等）。
 
-#### 2. 启动前端（手动开发模式）
+手动启动前端：
 
 > **Node.js 要求**：22.12 及以上（或 20.19+）。项目当前在 Node 22.11.0 下会收到 Vite 的版本提示，请按提示升级。
 
