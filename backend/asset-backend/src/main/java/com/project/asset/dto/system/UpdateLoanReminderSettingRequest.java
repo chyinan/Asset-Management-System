@@ -24,5 +24,10 @@ public class UpdateLoanReminderSettingRequest {
     private String smtpPassword;
 
     private Boolean smtpUseTls;
-}
 
+    @Min(value = 0, message = "提前提醒天数不能为负")
+    private Integer reminderStartDays;
+
+    @NotBlank(message = "提醒频率不能为空")
+    private String reminderCron;
+}

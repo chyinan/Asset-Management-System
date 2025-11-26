@@ -1,67 +1,66 @@
 <template>
   <div class="app-shell">
     <a href="#main-content" class="skip-link">跳到主内容</a>
-    <aside :class="['shell-sidebar', { collapsed: isSidebarCollapsed }]">
-      <div class="sidebar-brand">
-        <div class="brand-copy">
-          <p class="brand-title">资产管理系统</p>
-          <p class="brand-subtitle">Asset Control Suite</p>
-        </div>
-      </div>
-      <el-scrollbar class="sidebar-scroll">
-        <el-menu
-          class="sidebar-menu"
-          :default-active="activeRoute"
-          :collapse="isSidebarCollapsed"
-          :collapse-transition="false"
-          router
-        >
-          <template v-for="item in navigations" :key="item.path || item.label">
-            <el-sub-menu v-if="item.children?.length" :index="item.label">
-              <template #title>
-                <el-icon><component :is="item.icon" /></el-icon>
-                <span>{{ item.label }}</span>
-              </template>
-              <el-menu-item v-for="child in item.children" :key="child.path" :index="child.path!">
-                <el-icon><component :is="child.icon" /></el-icon>
-                <span>{{ child.label }}</span>
-              </el-menu-item>
-            </el-sub-menu>
-            <el-menu-item v-else :index="item.path!">
-              <el-icon><component :is="item.icon" /></el-icon>
-              <span>{{ item.label }}</span>
-              <el-tag v-if="item.badge && !isSidebarCollapsed" size="small" type="info" class="menu-badge">
-                {{ item.badge }}
-              </el-tag>
-            </el-menu-item>
-          </template>
-        </el-menu>
-      </el-scrollbar>
-      <footer class="sidebar-footer" v-if="!isSidebarCollapsed">
-        <p class="footer-title">欢迎，{{ authStore.username || '访客' }}</p>
-        <p class="footer-desc">保持资产流转透明，随时掌控</p>
-      </footer>
+    
+    <!-- Desktop Sidebar -->
+    <aside v-if="!isMobile" :class="['shell-sidebar', { collapsed: isSidebarCollapsed }]">
+      <AppSidebar 
+        :menuItems="navigations" 
+        :collapsed="isSidebarCollapsed"
+        :activeRoute="activeRoute"
+        :username="authStore.username"
+      />
     </aside>
+
+      <!-- Mobile Sidebar Drawer -->
+    <el-drawer
+      v-model="mobileMenuVisible"
+      direction="ltr"
+      :with-header="false"
+      size="280px"
+      class="mobile-sidebar-drawer"
+    >
+      <AppSidebar 
+        :menuItems="navigations" 
+        :collapsed="false"
+        :activeRoute="activeRoute"
+        :username="authStore.username"
+        @item-click="mobileMenuVisible = false"
+      />
+    </el-drawer>
+
     <div class="shell-main">
       <header class="shell-header" :class="{ 'is-compact': !showHero }">
-        <div class="header-meta" v-if="showHero">
-          <p class="header-eyebrow">{{ currentSection }}</p>
-          <div class="title-group">
-            <h1>{{ pageMeta.title }}</h1>
-            <p v-if="pageMeta.description" class="title-desc">{{ pageMeta.description }}</p>
+        <div class="header-left-group">
+          <el-button 
+            v-if="isMobile" 
+            text 
+            class="mobile-menu-btn"
+            @click="mobileMenuVisible = true"
+          >
+            <el-icon :size="24"><Expand /></el-icon>
+          </el-button>
+
+          <div class="header-meta" v-if="showHero">
+            <p class="header-eyebrow">{{ currentSection }}</p>
+            <div class="title-group">
+              <h1>{{ pageMeta.title }}</h1>
+              <p v-if="pageMeta.description" class="title-desc">{{ pageMeta.description }}</p>
+            </div>
+            <el-breadcrumb separator="/">
+              <el-breadcrumb-item v-for="item in breadcrumb" :key="item.label" :to="item.path || undefined">
+                {{ item.label }}
+              </el-breadcrumb-item>
+            </el-breadcrumb>
           </div>
-          <el-breadcrumb separator="/">
-            <el-breadcrumb-item v-for="item in breadcrumb" :key="item.label" :to="item.path || undefined">
-              {{ item.label }}
-            </el-breadcrumb-item>
-          </el-breadcrumb>
+          <div v-else class="header-spacer" aria-hidden="true"></div>
         </div>
-        <div v-else class="header-spacer" aria-hidden="true"></div>
+
         <div class="header-actions">
           <el-dropdown>
             <span class="user-chip">
               <el-avatar size="small">{{ initials }}</el-avatar>
-              <span class="user-name">{{ authStore.username || '未登录' }}</span>
+              <span class="user-name" v-if="!isMobile">{{ authStore.username || '未登录' }}</span>
               <el-icon><CaretBottom /></el-icon>
             </span>
             <template #dropdown>
@@ -83,56 +82,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type Component } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter, RouterView } from 'vue-router'
 import { useAuthStore } from '@/store/auth'
 import { usePermission } from '@/utils/permission'
+import { useDevice } from '@/composables/useDevice'
+import { navigationConfig, type NavigationItem } from '@/config/menu'
+import AppSidebar from './components/AppSidebar.vue'
 import {
-  Avatar,
-  Box,
   CaretBottom,
-  Collection,
-  CollectionTag,
-  DataAnalysis,
-  Memo,
-  Message,
-  OfficeBuilding,
-  Setting,
-  Tickets
+  Expand
 } from '@element-plus/icons-vue'
-
-interface NavigationItem {
-  label: string
-  path?: string
-  icon: Component
-  badge?: string
-  permission?: string | string[]
-  anyOf?: string[]
-  children?: NavigationItem[]
-}
-
-const navigationConfig: NavigationItem[] = [
-  { label: '仪表盘', path: '/', icon: DataAnalysis },
-  { label: '资产申请', path: '/requests', icon: Tickets, permission: 'asset:view' },
-  {
-    label: '库存管理',
-    path: '/inventory',
-    icon: Box,
-    permission: 'asset:stockin'
-  },
-  {
-    label: '系统管理',
-    icon: Setting,
-    children: [
-      { label: '用户管理', path: '/system/users', icon: Avatar, permission: 'user:manage' },
-      { label: '角色管理', path: '/system/roles', icon: CollectionTag, permission: 'role:manage' },
-      { label: '部门管理', path: '/system/departments', icon: OfficeBuilding, permission: 'asset:admin' },
-      { label: '资产类型', path: '/system/asset-types', icon: Collection, permission: 'asset:admin' },
-      { label: '提醒邮箱', path: '/system/reminder-email', icon: Message, permission: 'asset:admin' }
-    ]
-  },
-  { label: '审计日志', path: '/audit', icon: Memo, permission: 'audit:view' }
-]
 
 const pageCopy: Record<
   string,
@@ -198,7 +158,15 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 const { hasPermission } = usePermission()
+const { isMobile } = useDevice()
+
 const isSidebarCollapsed = ref(false)
+const mobileMenuVisible = ref(false)
+
+// Close mobile menu on route change
+watch(() => route.path, () => {
+  mobileMenuVisible.value = false
+})
 
 const canAccess = (item: NavigationItem) => {
   if (item.permission && !hasPermission(item.permission)) return false
@@ -298,107 +266,16 @@ const handleLogout = async () => {
 
 .shell-sidebar {
   width: var(--ams-layout-sidebarWidth, 240px);
-  background: radial-gradient(circle at top, rgba(77, 103, 255, 0.35), rgba(8, 13, 36, 0.95)),
-    #0b1224;
-  color: #f8fbff;
-  display: flex;
-  flex-direction: column;
   flex-shrink: 0;
   transition: width var(--ams-motion-base, 200ms ease);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
   height: 100vh;
   position: sticky;
   top: 0;
+  /* Sidebar content style is handled by AppSidebar component, but we need container style here for layout */
 }
 
 .shell-sidebar.collapsed {
   width: 88px;
-}
-
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 22px 18px 12px;
-}
-
-.brand-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.brand-subtitle {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: rgba(248, 251, 255, 0.65);
-}
-
-.sidebar-toggle {
-  margin-left: auto;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.sidebar-scroll {
-  flex: 1;
-  padding: 0 12px 16px;
-}
-
-.shell-sidebar.collapsed .sidebar-footer {
-  display: none;
-}
-
-.sidebar-menu {
-  background: transparent;
-  border-right: none;
-}
-
-:deep(.sidebar-menu .el-menu-item),
-:deep(.sidebar-menu .el-sub-menu__title) {
-  border-radius: var(--ams-radius-md, 12px);
-  margin: 4px 0;
-  height: 44px;
-  color: rgba(248, 251, 255, 0.86);
-}
-
-:deep(.sidebar-menu .el-menu-item:hover),
-:deep(.sidebar-menu .el-sub-menu__title:hover) {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-:deep(.sidebar-menu .el-menu--inline) {
-  background: transparent;
-}
-
-:deep(.sidebar-menu .el-menu--inline .el-menu-item) {
-  background: transparent;
-}
-
-:deep(.el-menu-item.is-active) {
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
-}
-
-.menu-badge {
-  margin-left: auto;
-}
-
-.sidebar-footer {
-  padding: 18px 22px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 13px;
-  color: rgba(248, 251, 255, 0.8);
-}
-
-.footer-title {
-  margin: 0 0 4px;
-  font-weight: 600;
-}
-
-.footer-desc {
-  margin: 0;
-  color: rgba(248, 251, 255, 0.64);
 }
 
 .shell-main {
@@ -420,6 +297,20 @@ const handleLogout = async () => {
   background: var(--ams-surface-card, #ffffff);
   border-bottom: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
   box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+}
+
+.header-left-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+}
+
+.mobile-menu-btn {
+  padding: 0;
+  margin-top: 4px; /* Align with title approx */
+  height: auto;
+  color: var(--ams-text-primary, #0f172a);
 }
 
 .header-meta {
@@ -461,10 +352,8 @@ const handleLogout = async () => {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.header-icon-btn {
-  color: var(--ams-text-muted, #98a2b3);
+  align-self: flex-start;
+  padding-top: 4px;
 }
 
 .user-chip {
@@ -508,31 +397,30 @@ const handleLogout = async () => {
   left: 16px;
 }
 
-@media (max-width: 1200px) {
+/* Mobile adjustments */
+@media (max-width: 768px) {
   .shell-header {
-    flex-direction: column;
-    align-items: flex-start;
+    padding: 16px 20px;
   }
-
+  
+  .shell-content {
+    padding: 20px 16px 32px;
+  }
+  
+  .title-group h1 {
+    font-size: 20px;
+  }
+  
   .header-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .search-input {
-    flex: 1;
+    margin-left: auto;
   }
 }
+</style>
 
-@media (max-width: 900px) {
-  .shell-sidebar {
-    position: fixed;
-    z-index: 20;
-    height: 100vh;
-  }
-
-  .shell-main {
-    margin-left: 88px;
-  }
+<style>
+/* Global styles for drawer */
+.mobile-sidebar-drawer .el-drawer__body {
+  padding: 0 !important;
+  background: #0b1224; /* Match sidebar background base */
 }
 </style>

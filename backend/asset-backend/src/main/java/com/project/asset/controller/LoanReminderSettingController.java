@@ -4,6 +4,7 @@ import com.project.asset.dto.system.LoanReminderSettingDto;
 import com.project.asset.dto.system.UpdateLoanReminderSettingRequest;
 import com.project.asset.response.ApiResponse;
 import com.project.asset.security.UserPrincipal;
+import com.project.asset.service.LoanReminderService;
 import com.project.asset.service.LoanReminderSettingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoanReminderSettingController {
 
     private final LoanReminderSettingService settingService;
+    private final LoanReminderService loanReminderService;
 
     @Operation(summary = "获取资产归还提醒发送邮箱")
     @GetMapping
@@ -39,7 +41,8 @@ public class LoanReminderSettingController {
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody UpdateLoanReminderSettingRequest request) {
         Long operatorId = principal != null ? principal.getUserId() : null;
-        return ApiResponse.success(settingService.updateSettings(request, operatorId));
+        LoanReminderSettingDto updated = settingService.updateSettings(request, operatorId);
+        loanReminderService.refreshSchedule();
+        return ApiResponse.success(updated);
     }
 }
-

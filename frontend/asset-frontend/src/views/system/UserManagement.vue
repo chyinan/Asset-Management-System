@@ -12,7 +12,8 @@
     </template>
 
     <div class="table-shell surface-card">
-      <el-table v-if="filteredUsers.length" :data="filteredUsers" v-loading="loading" stripe>
+      <!-- Desktop Table -->
+      <el-table v-if="!isMobile && filteredUsers.length" :data="filteredUsers" v-loading="loading" stripe>
         <el-table-column prop="username" label="用户名" width="160" />
         <el-table-column prop="fullName" label="姓名" />
         <el-table-column prop="email" label="邮箱" />
@@ -24,6 +25,26 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- Mobile List -->
+      <div v-else-if="isMobile && filteredUsers.length" v-loading="loading" class="mobile-list">
+        <div v-for="user in filteredUsers" :key="user.username" class="mobile-card">
+          <div class="mobile-card-header">
+            <span class="username">{{ user.username }}</span>
+            <span class="fullname">{{ user.fullName || '未设置姓名' }}</span>
+          </div>
+          <div class="mobile-card-body">
+            <div class="info-row" v-if="user.email">
+              <span class="label">邮箱：</span>
+              <span class="value">{{ user.email }}</span>
+            </div>
+            <div class="roles-row">
+              <el-tag v-for="role in user.roles" :key="role" size="small" class="role-tag">{{ role }}</el-tag>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <el-skeleton v-else-if="loading" :rows="5" animated />
       <el-empty v-else description="暂无用户" />
     </div>
@@ -62,6 +83,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { listUsers, createUser, type UserPayload } from '@/api/modules/system'
+import { useDevice } from '@/composables/useDevice'
 import PageContainer from '@/components/common/PageContainer.vue'
 import { Search } from '@element-plus/icons-vue'
 
@@ -77,6 +99,7 @@ const keyword = ref('')
 const loading = ref(false)
 const saving = ref(false)
 const showCreate = ref(false)
+const { isMobile } = useDevice()
 
 const form = reactive<UserPayload>({
   username: '',
@@ -126,6 +149,62 @@ onMounted(fetchData)
 .table-shell {
   padding: 24px;
   border-radius: var(--ams-radius-lg, 18px);
+}
+
+/* Mobile Styles */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: #fff;
+  border: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ams-text-primary, #0f172a);
+}
+
+.fullname {
+  font-size: 13px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+.mobile-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-row {
+  font-size: 13px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+.roles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .table-shell {
+    padding: 16px;
+  }
 }
 </style>
 

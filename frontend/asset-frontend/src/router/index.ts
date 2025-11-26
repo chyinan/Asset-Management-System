@@ -57,7 +57,7 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, permission: 'asset:admin' }
       },
       {
-        path: 'system/reminder-email',
+        path: 'system/reminder-settings',
         name: 'ReminderSettings',
         component: () => import('@/views/system/ReminderSettings.vue'),
         meta: { requiresAuth: true, permission: 'asset:admin' }

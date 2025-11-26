@@ -13,7 +13,8 @@
       </div>
     </template>
     <div class="table-shell surface-card">
-      <el-table v-if="filteredRoles.length" :data="filteredRoles" v-loading="loading" stripe>
+      <!-- Desktop Table -->
+      <el-table v-if="!isMobile && filteredRoles.length" :data="filteredRoles" v-loading="loading" stripe>
         <el-table-column prop="code" label="编码" width="160" />
         <el-table-column prop="name" label="名称" width="200" />
         <el-table-column prop="remark" label="备注" width="200" />
@@ -30,6 +31,28 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- Mobile List -->
+      <div v-else-if="isMobile && filteredRoles.length" v-loading="loading" class="mobile-list">
+        <div v-for="role in filteredRoles" :key="role.id" class="mobile-card">
+          <div class="mobile-card-header">
+            <div class="header-main">
+              <span class="role-name">{{ role.name }}</span>
+              <span class="role-code">{{ role.code }}</span>
+            </div>
+            <el-button type="primary" link size="small" @click="openEdit(role)">编辑</el-button>
+          </div>
+          <div class="mobile-card-body">
+            <div class="info-row" v-if="role.remark">
+              {{ role.remark }}
+            </div>
+            <div class="permission-list">
+              <el-tag v-for="perm in role.permissions" :key="perm" size="small" type="info">{{ perm }}</el-tag>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <el-skeleton v-else-if="loading" :rows="4" animated />
       <el-empty v-else description="暂无角色" />
   </div>
@@ -63,6 +86,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { createRole, listPermissions, listRoles, updateRole } from '@/api/modules/system'
 import PageContainer from '@/components/common/PageContainer.vue'
+import { useDevice } from '@/composables/useDevice'
 import { Search } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
@@ -83,6 +107,7 @@ const dialogMode = ref<'create' | 'edit'>('create')
 const saving = ref(false)
 const availablePermissions = ref<string[]>([])
 const formRef = ref<FormInstance>()
+const { isMobile } = useDevice()
 const formModel = reactive({
   id: 0,
   code: '',
@@ -198,5 +223,80 @@ onMounted(async () => {
 .actions {
   display: flex;
   gap: 12px;
+}
+
+/* Mobile Styles */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: #fff;
+  border: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.role-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ams-text-primary, #0f172a);
+}
+
+.role-code {
+  font-size: 12px;
+  color: var(--ams-text-muted, #98a2b3);
+  font-family: monospace;
+}
+
+.mobile-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-row {
+  font-size: 13px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+.permission-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .table-shell {
+    padding: 16px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .actions .el-input {
+    width: 100% !important;
+  }
+  
+  .actions .el-button {
+    width: 100%;
+  }
 }
 </style>

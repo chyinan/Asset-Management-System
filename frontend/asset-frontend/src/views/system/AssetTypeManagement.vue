@@ -59,6 +59,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import PageContainer from '@/components/common/PageContainer.vue'
 import { createAssetType, deleteAssetType, listAssetTypes, updateAssetType } from '@/api/modules/basic'
 import type { AssetType } from '@/types/domain'
+import { useDevice } from '@/composables/useDevice'
 import { Search } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -70,6 +71,7 @@ const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'edit'>('create')
 const saving = ref(false)
 const formRef = ref<FormInstance>()
+const { isMobile } = useDevice()
 const formModel = reactive({
   id: 0,
   name: '',
@@ -181,5 +183,72 @@ onMounted(fetchData)
   display: flex;
   gap: 12px;
   align-items: center;
+}
+
+/* Mobile Styles */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: #fff;
+  border: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.type-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ams-text-primary, #0f172a);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-card-body {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+@media (max-width: 768px) {
+  .table-shell {
+    padding: 16px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  
+  .actions .el-input {
+    width: 100% !important;
+  }
+
+  .actions .el-tag {
+    align-self: flex-start;
+  }
+  
+  .actions .el-button {
+    width: 100%;
+  }
 }
 </style>

@@ -15,7 +15,7 @@
           :prefix-icon="Search"
           class="toolbar-input"
         />
-        <el-select v-model="statusFilter" placeholder="状态筛选" clearable style="width: 180px">
+        <el-select v-model="statusFilter" placeholder="状态筛选" clearable style="width: 180px" class="filter-select">
           <el-option
             v-for="option in statusOptions"
             :key="option.value"
@@ -29,7 +29,9 @@
         <span>待审批 {{ summary.pending }}</span>
         <span>已通过 {{ summary.approved }}</span>
       </div>
-      <el-table v-if="filteredRequests.length" :data="filteredRequests" v-loading="loading" stripe>
+      
+      <!-- Desktop Table -->
+      <el-table v-if="!isMobile && filteredRequests.length" :data="filteredRequests" v-loading="loading" stripe>
         <el-table-column prop="requestNo" label="申请编号" width="160" />
         <el-table-column label="状态" width="120">
           <template #default="{ row }">
@@ -52,14 +54,37 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- Mobile List View -->
+      <div v-else-if="isMobile && filteredRequests.length" v-loading="loading" class="mobile-list">
+        <div v-for="row in filteredRequests" :key="row.id" class="mobile-card">
+          <div class="mobile-card-header">
+            <span class="request-no">{{ row.requestNo }}</span>
+            <el-tag :type="statusTag(row.status)" size="small">{{ statusText(row.status) }}</el-tag>
+          </div>
+          <div class="mobile-card-body">
+            <p class="remark-text">{{ row.remark || '无备注' }}</p>
+            <div class="item-tags">
+              <el-tag v-for="item in row.items" :key="item.id" size="small" type="info">
+                {{ item.assetTypeId }} x{{ item.quantity }}
+              </el-tag>
+            </div>
+          </div>
+          <div class="mobile-card-footer" v-if="hasPermission('asset:approve')">
+            <el-button size="small" type="primary" plain @click="openApproval(row)" class="full-width-btn">审批</el-button>
+          </div>
+        </div>
+      </div>
+
       <el-skeleton v-else-if="loading" :rows="5" animated />
       <el-empty v-else description="暂无申请记录" />
       <el-pagination
         class="mt-16"
-        background
+        :background="!isMobile"
+        :small="isMobile"
+        :layout="isMobile ? 'prev, pager, next' : 'total, prev, pager, next'"
         :current-page="pagination.page"
         :page-size="pagination.size"
-        layout="total, prev, pager, next"
         :total="pagination.total"
         @current-change="handlePageChange"
       />
@@ -128,6 +153,7 @@ import { listDepartments, listAssetTypes } from '@/api/modules/basic'
 import { listAssetRequests, createAssetRequest, approveAssetRequest } from '@/api/modules/asset'
 import type { AssetRequest, AssetType, Department } from '@/types/domain'
 import { usePermission } from '@/utils/permission'
+import { useDevice } from '@/composables/useDevice'
 import PageContainer from '@/components/common/PageContainer.vue'
 import { Plus, Search } from '@element-plus/icons-vue'
 
@@ -146,6 +172,7 @@ const summary = reactive({
   approved: 0
 })
 const { hasPermission } = usePermission()
+const { isMobile } = useDevice()
 
 const pagination = reactive({
   page: 1,
@@ -348,6 +375,85 @@ onMounted(() => {
 
 .mt-16 {
   margin-top: 16px;
+}
+
+/* Mobile styles */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: #fff;
+  border: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.request-no {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ams-text-primary, #0f172a);
+}
+
+.mobile-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.remark-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+.item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mobile-card-footer {
+  margin-top: 4px;
+  display: flex;
+}
+
+.full-width-btn {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .table-shell {
+    padding: 16px;
+  }
+  
+  .table-toolbar {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filter-select {
+    width: 100% !important;
+  }
+  
+  .item-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+  }
 }
 </style>
 

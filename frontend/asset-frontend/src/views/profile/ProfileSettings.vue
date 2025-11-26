@@ -1,7 +1,14 @@
 <template>
   <PageContainer title="个人设置" description="更新您的显示名称和邮箱">
     <div class="form-card surface-card">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" :disabled="loading">
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        :label-width="isMobile ? 'auto' : '100px'"
+        :label-position="isMobile ? 'top' : 'right'"
+        :disabled="loading"
+      >
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" />
         </el-form-item>
@@ -12,8 +19,8 @@
           <el-input v-model="form.email" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" :loading="saving" @click="handleSubmit">保存</el-button>
-          <el-button :loading="loading" @click="fetchProfile">刷新</el-button>
+          <el-button type="primary" :loading="saving" @click="handleSubmit" class="action-btn">保存</el-button>
+          <el-button :loading="loading" @click="fetchProfile" class="action-btn">刷新</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -26,6 +33,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import PageContainer from '@/components/common/PageContainer.vue'
 import { useAuthStore } from '@/store/auth'
 import http from '@/api/http'
+import { useDevice } from '@/composables/useDevice'
 
 interface ProfileResponse {
   id: number
@@ -38,6 +46,7 @@ const formRef = ref<FormInstance>()
 const loading = ref(false)
 const saving = ref(false)
 const authStore = useAuthStore()
+const { isMobile } = useDevice()
 
 const form = reactive({
   username: '',
@@ -85,6 +94,16 @@ onMounted(fetchProfile)
   max-width: 520px;
   border-radius: var(--ams-radius-lg, 18px);
   padding: 32px;
+}
+
+@media (max-width: 768px) {
+  .form-card {
+    padding: 20px;
+  }
+  
+  .action-btn {
+    width: 48%;
+  }
 }
 </style>
 

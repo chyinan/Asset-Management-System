@@ -46,6 +46,14 @@ public class LoanReminderSettingService {
             setting.setSmtpPassword(request.getSmtpPassword());
         }
         setting.setSmtpUseTls(Boolean.TRUE.equals(request.getSmtpUseTls()));
+        
+        if (request.getReminderStartDays() != null) {
+            setting.setReminderStartDays(request.getReminderStartDays());
+        }
+        if (StringUtils.hasText(request.getReminderCron())) {
+            setting.setReminderCron(request.getReminderCron());
+        }
+
         setting.setUpdatedAt(LocalDateTime.now());
         if (operatorId != null) {
             userRepository.findById(operatorId).ifPresent(setting::setUpdatedBy);
@@ -72,6 +80,12 @@ public class LoanReminderSettingService {
         if (!StringUtils.hasText(setting.getSmtpHost())
                 || setting.getSmtpPort() == null
                 || !StringUtils.hasText(setting.getSmtpUsername())
+                // Password can be empty if not changed, but here we need it for sending.
+                // Wait, update logic only sets password if provided. 
+                // If previously saved, it should be in DB. 
+                // But here we check if it has text.
+                // If DB has encrypted pass, we assume it's fine.
+                // Actually the check below requires password text.
                 || !StringUtils.hasText(setting.getSmtpPassword())) {
             return defaultSender;
         }
@@ -92,6 +106,8 @@ public class LoanReminderSettingService {
         LoanReminderSetting created = new LoanReminderSetting();
         created.setId(SINGLETON_ID);
         created.setSmtpUseTls(Boolean.FALSE);
+        created.setReminderStartDays(7);
+        created.setReminderCron(loanReminderProperties.getReminderCron());
         return created;
     }
 
@@ -107,6 +123,8 @@ public class LoanReminderSettingService {
             return LoanReminderSettingDto.builder()
                     .senderEmail(loanReminderProperties.getReminderEmailFrom())
                     .smtpUseTls(Boolean.FALSE)
+                    .reminderStartDays(7)
+                    .reminderCron(loanReminderProperties.getReminderCron())
                     .build();
         }
         return LoanReminderSettingDto.builder()
@@ -119,6 +137,8 @@ public class LoanReminderSettingService {
                 .smtpPort(setting.getSmtpPort())
                 .smtpUsername(setting.getSmtpUsername())
                 .smtpUseTls(Boolean.TRUE.equals(setting.getSmtpUseTls()))
+                .reminderStartDays(setting.getReminderStartDays() != null ? setting.getReminderStartDays() : 7)
+                .reminderCron(StringUtils.hasText(setting.getReminderCron()) ? setting.getReminderCron() : loanReminderProperties.getReminderCron())
                 .build();
     }
 
@@ -128,5 +148,8 @@ public class LoanReminderSettingService {
         }
         return user.getUsername();
     }
+    
+    public Optional<LoanReminderSetting> getSettingEntity() {
+        return settingRepository.findById(SINGLETON_ID);
+    }
 }
-

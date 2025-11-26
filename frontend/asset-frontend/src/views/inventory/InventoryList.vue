@@ -13,10 +13,10 @@
           :prefix-icon="Search"
           class="toolbar-input"
         />
-        <el-radio-group v-model="statusFilter" size="small">
+        <el-radio-group v-model="statusFilter" :size="isMobile ? 'small' : 'default'">
           <el-radio-button label="ALL">全部</el-radio-button>
           <el-radio-button label="IN_STOCK">在库</el-radio-button>
-          <el-radio-button label="CHECKED_OUT">领用中</el-radio-button>
+          <el-radio-button label="CHECKED_OUT">{{ isMobile ? '领用' : '领用中' }}</el-radio-button>
           <el-radio-button label="SCRAPPED">报废</el-radio-button>
         </el-radio-group>
       </div>
@@ -25,7 +25,9 @@
         <span>领用 {{ summary.checkout }}</span>
         <span>报废 {{ summary.scrapped }}</span>
       </div>
-      <el-table v-if="filteredInventories.length" :data="filteredInventories" v-loading="loading" stripe>
+      
+      <!-- Desktop Table -->
+      <el-table v-if="!isMobile && filteredInventories.length" :data="filteredInventories" v-loading="loading" stripe>
         <el-table-column prop="assetNo" label="资产编号" width="160" />
         <el-table-column prop="assetName" label="资产名称" min-width="160" />
         <el-table-column prop="serialNo" label="序列号" width="160" />
@@ -65,12 +67,62 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- Mobile List View -->
+      <div v-else-if="isMobile && filteredInventories.length" v-loading="loading" class="mobile-list">
+        <div v-for="row in filteredInventories" :key="row.id" class="mobile-card">
+          <div class="mobile-card-header">
+            <div class="header-left">
+              <span class="asset-name">{{ row.assetName }}</span>
+              <span class="asset-no">{{ row.assetNo }}</span>
+            </div>
+            <el-tag :type="statusType(row.status)" size="small">{{ statusText(row.status) }}</el-tag>
+          </div>
+          
+          <div class="mobile-card-body">
+            <div class="info-row" v-if="row.location">
+              <span class="label">位置：</span>
+              <span class="value">{{ row.location }}</span>
+            </div>
+            <div class="info-row" v-if="row.currentHolderName">
+              <span class="label">领用人：</span>
+              <span class="value">{{ row.currentHolderName }}</span>
+            </div>
+             <div class="info-row" v-if="row.expectedReturnAt">
+              <span class="label">预计归还：</span>
+              <span class="value">{{ formatDatetime(row.expectedReturnAt) }}</span>
+            </div>
+          </div>
+
+          <div class="mobile-card-footer">
+            <el-button
+              size="small"
+              class="action-btn"
+              v-if="row.status === 'IN_STOCK' && hasPermission('asset:checkout')"
+              @click="openCheckout(row)"
+            >
+              领用
+            </el-button>
+            <el-button
+              size="small"
+              type="success"
+              class="action-btn"
+              v-if="row.status === 'CHECKED_OUT' && hasPermission('asset:return')"
+              @click="openReturn(row)"
+            >
+              归还
+            </el-button>
+          </div>
+        </div>
+      </div>
+
       <el-skeleton v-else-if="loading" :rows="6" animated />
       <el-empty v-else description="暂无资产记录" />
       <el-pagination
         class="mt-16"
-        layout="total, prev, pager, next"
-        background
+        :layout="isMobile ? 'prev, pager, next' : 'total, prev, pager, next'"
+        :background="!isMobile"
+        :small="isMobile"
         :current-page="pagination.page"
         :page-size="pagination.size"
         :total="pagination.total"
@@ -134,6 +186,7 @@ import { ElMessage } from 'element-plus'
 import { stockIn, checkoutInventory, returnInventory, listInventory } from '@/api/modules/asset'
 import type { Inventory } from '@/types/domain'
 import { usePermission } from '@/utils/permission'
+import { useDevice } from '@/composables/useDevice'
 import { Search } from '@element-plus/icons-vue'
 import PageContainer from '@/components/common/PageContainer.vue'
 
@@ -147,6 +200,7 @@ const currentInventory = ref<Inventory | null>(null)
 const keyword = ref('')
 const statusFilter = ref<'ALL' | 'IN_STOCK' | 'CHECKED_OUT' | 'SCRAPPED'>('ALL')
 const { hasPermission } = usePermission()
+const { isMobile } = useDevice()
 
 const pagination = reactive({
   page: 1,
@@ -314,6 +368,85 @@ onMounted(fetchData)
 
 .mt-16 {
   margin-top: 16px;
+}
+
+/* Mobile Styles */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: #fff;
+  border: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.asset-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ams-text-primary, #0f172a);
+}
+
+.asset-no {
+  font-size: 12px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+.mobile-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+.info-row {
+  display: flex;
+  gap: 8px;
+}
+
+.info-row .label {
+  color: var(--ams-text-muted, #98a2b3);
+  min-width: 60px;
+}
+
+.mobile-card-footer {
+  margin-top: 4px;
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .table-shell {
+    padding: 16px;
+  }
+
+  .table-toolbar {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 </style>
 

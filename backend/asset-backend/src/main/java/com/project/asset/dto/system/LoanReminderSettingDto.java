@@ -14,5 +14,6 @@ public class LoanReminderSettingDto {
     Integer smtpPort;
     String smtpUsername;
     Boolean smtpUseTls;
+    Integer reminderStartDays;
+    String reminderCron;
 }
-

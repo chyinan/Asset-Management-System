@@ -13,7 +13,8 @@
       </div>
     </template>
     <div class="table-shell surface-card">
-      <el-table v-if="filteredDepartments.length" :data="filteredDepartments" v-loading="loading" stripe>
+      <!-- Desktop Table -->
+      <el-table v-if="!isMobile && filteredDepartments.length" :data="filteredDepartments" v-loading="loading" stripe>
         <el-table-column prop="name" label="名称" />
         <el-table-column label="上级部门" width="180">
           <template #default="{ row }">
@@ -28,6 +29,28 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!-- Mobile List -->
+      <div v-else-if="isMobile && filteredDepartments.length" v-loading="loading" class="mobile-list">
+        <div v-for="dept in filteredDepartments" :key="dept.id" class="mobile-card">
+          <div class="mobile-card-header">
+            <div class="header-content">
+              <span class="dept-name">{{ dept.name }}</span>
+              <el-tag v-if="dept.parentId" size="small" type="info" class="parent-tag">
+                上级: {{ parentName(dept.parentId) }}
+              </el-tag>
+            </div>
+            <div class="card-actions">
+              <el-button type="primary" link size="small" @click="openEdit(dept)">编辑</el-button>
+              <el-button type="danger" link size="small" @click="confirmDelete(dept)">删除</el-button>
+            </div>
+          </div>
+          <div class="mobile-card-body" v-if="dept.remark">
+            <span class="remark-text">{{ dept.remark }}</span>
+          </div>
+        </div>
+      </div>
+
       <el-skeleton v-else-if="loading" :rows="4" animated />
       <el-empty v-else description="暂无部门" />
   </div>
@@ -64,6 +87,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { createDepartment, deleteDepartment, listDepartments, updateDepartment } from '@/api/modules/basic'
 import type { Department } from '@/types/domain'
 import PageContainer from '@/components/common/PageContainer.vue'
+import { useDevice } from '@/composables/useDevice'
 import { Search } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -75,6 +99,7 @@ const dialogVisible = ref(false)
 const dialogMode = ref<'create' | 'edit'>('create')
 const formRef = ref<FormInstance>()
 const saving = ref(false)
+const { isMobile } = useDevice()
 const formModel = reactive({
   id: 0,
   name: '',
@@ -189,5 +214,67 @@ onMounted(fetchData)
 .actions {
   display: flex;
   gap: 12px;
+}
+
+/* Mobile Styles */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: #fff;
+  border: 1px solid var(--ams-border-subtle, rgba(15, 23, 42, 0.08));
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.mobile-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dept-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ams-text-primary, #0f172a);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.mobile-card-body {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ams-text-secondary, #475467);
+}
+
+@media (max-width: 768px) {
+  .table-shell {
+    padding: 16px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .actions .el-input {
+    width: 100% !important;
+  }
+  
+  .actions .el-button {
+    width: 100%;
+  }
 }
 </style>

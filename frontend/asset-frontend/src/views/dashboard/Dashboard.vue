@@ -100,6 +100,7 @@ import { useRouter } from 'vue-router'
 import PageContainer from '@/components/common/PageContainer.vue'
 import ChartCard from '@/components/analytics/ChartCard.vue'
 import { usePermission } from '@/utils/permission'
+import { useDevice } from '@/composables/useDevice'
 import { listAssetRequests, listInventory } from '@/api/modules/asset'
 import type { AssetRequest, Inventory } from '@/types/domain'
 import type { PageResponse } from '@/types/api'
@@ -117,6 +118,7 @@ interface QuickAction {
 
 const router = useRouter()
 const { hasPermission } = usePermission()
+const { isMobile } = useDevice()
 const loading = ref(false)
 const pendingRequests = ref<AssetRequest[]>([])
 const requestsSnapshot = ref<AssetRequest[]>([])
@@ -277,20 +279,28 @@ const inventoryStatusOption = computed<EChartsOption>(() => {
       value: inventorySnapshot.value.filter((item) => item.status === 'SCRAPPED').length
     }
   ]
+  
+  const isSmallScreen = isMobile.value
+  
   return {
     tooltip: { trigger: 'item' },
     legend: {
       orient: 'vertical',
-      right: 10,
+      right: isSmallScreen ? 0 : 10,
       top: 'center',
-      textStyle: { color: '#475467' }
+      textStyle: { color: '#475467', fontSize: isSmallScreen ? 12 : 14 }
     },
     series: [
       {
         type: 'pie',
-        radius: ['55%', '78%'],
-        center: ['40%', '50%'],
-        label: { formatter: '{b}\n{d}%', color: '#0f172a' },
+        radius: isSmallScreen ? ['35%', '55%'] : ['55%', '78%'],
+        center: isSmallScreen ? ['35%', '50%'] : ['40%', '50%'],
+        label: { 
+          formatter: isSmallScreen ? '{d}%' : '{b}\n{d}%', 
+          color: '#0f172a',
+          position: isSmallScreen ? 'inside' : 'outside',
+          fontSize: isSmallScreen ? 10 : 12
+        },
         data: statusData,
         itemStyle: {
           borderColor: '#fff',

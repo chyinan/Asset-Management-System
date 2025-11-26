@@ -44,10 +44,11 @@ export interface ReminderSettings {
   smtpUseTls?: boolean
   updatedBy?: string
   updatedAt?: string
+  reminderStartDays?: number
+  reminderCron?: string
 }
 
 export const getReminderSettings = () => http.get<ReminderSettings>('/system/reminder-settings')
 
 export const updateReminderSettings = (payload: ReminderSettings & { smtpPassword?: string }) =>
   http.put<ReminderSettings>('/system/reminder-settings', payload)
-

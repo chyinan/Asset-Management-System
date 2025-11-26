@@ -44,5 +44,11 @@ public class LoanReminderSetting {
 
     @Column(name = "smtp_use_tls")
     private Boolean smtpUseTls = Boolean.FALSE;
+
+    @Column(name = "reminder_start_days")
+    private Integer reminderStartDays = 7;
+
+    @Column(name = "reminder_cron", length = 100)
+    private String reminderCron = "0 0 9 ? * MON";
 }
 
