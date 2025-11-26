@@ -124,14 +124,14 @@ const actionFilter = ref<string>('')
 const filterStart = ref<Date | null>(null)
 const filterEnd = ref<Date | null>(null)
 
-const dateRange = computed<DateRange>({
-  get: () => {
+const dateRange = computed({
+  get: (): DateRange => {
     if (filterStart.value && filterEnd.value) {
       return [filterStart.value, filterEnd.value]
     }
     return null
   },
-  set: (val: DateRange | null) => {
+  set: (val: DateRange) => {
     if (val) {
       filterStart.value = val[0]
       filterEnd.value = val[1]
