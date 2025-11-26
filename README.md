@@ -17,7 +17,7 @@
 backend/asset-backend     # Spring Boot 服务
 frontend/asset-frontend   # Vue3 + Element Plus 前端
 infra/postman             # Postman/Insomnia 示例
-docker-compose.yml        # 一键启动 MySQL + 后端
+docker-compose.yml        # 一键启动 MySQL + 后端 + 前端
 README.md                 # 当前文档
 ```
 
@@ -25,11 +25,12 @@ README.md                 # 当前文档
 
 ### 快速开始
 
-#### 1. 启动数据库 + 后端（推荐 Docker）
+#### 1. 启动数据库 + 后端 + 前端（推荐 Docker）
 
 ```bash
 cp docker/.env.example .env           # 可选，覆盖默认环境
-docker compose up -d                  # 启动 mysql + backend
+docker compose up -d                  # 启动 mysql + backend + frontend
+# 前端将监听 0.0.0.0:80
 # 后端将监听 0.0.0.0:8080
 ```
 
@@ -45,9 +46,17 @@ cd backend/asset-backend
     -DJWT_SECRET=popcap"
 ```
 
+手动方式（IntelliJ IDEA）：
+
+1. **导入项目**：打开 IDEA，选择 `Open`，指向 `backend/asset-backend` 目录（识别为 Maven 项目）。
+2. **配置数据库**：确保本地 MySQL 已启动（端口 3306，账号 root/123456）且存在 `asset` 库。
+   - 若使用 Docker 启动的 MySQL，会自动初始化，无需额外配置。
+   - 若需修改数据库配置，可在 Run Configuration 的 Environment variables 中添加 `DB_PASSWORD=your_password` 等。
+3. **运行**：找到 `src/main/java/com/project/asset/AssetBackendApplication.java`，点击运行（Run）。
+
 Flyway 会在首次启动时自动创建并初始化数据库（含种子数据、角色、权限、示例资产等）。
 
-#### 2. 启动前端
+#### 2. 启动前端（手动开发模式）
 
 > **Node.js 要求**：22.12 及以上（或 20.19+）。项目当前在 Node 22.11.0 下会收到 Vite 的版本提示，请按提示升级。
 
@@ -173,6 +182,7 @@ docker compose up -d
 
 - `mysql`：初始化数据库 `asset`，默认账号/密码 `root/123456`
 - `asset-backend`：等待 mysql 就绪后启动，暴露 8080 端口（JWT 默认为 `popcap`）
+- `asset-frontend`：构建并启动前端（Nginx），暴露 80 端口，反向代理 API 请求到后端
 
 ---
 

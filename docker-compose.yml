@@ -1,8 +1,8 @@
-version: "3.9"
+RHTTPS://HP-STATIC.COOCARE.COM/DOWNLOAD/DOWNLOAversion: "3.9"
 
 services:
   mysql:
-    image: mysql:8.4
+    image: mysql:8.0
     container_name: asset-mysql
     environment:
       MYSQL_DATABASE: asset
@@ -17,6 +17,11 @@ services:
       --collation-server=utf8mb4_unicode_ci
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   asset-backend:
     build:
@@ -24,7 +29,8 @@ services:
       dockerfile: Dockerfile
     container_name: asset-backend
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       DB_URL: jdbc:mysql://mysql:3306/asset?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       DB_USERNAME: root
@@ -33,6 +39,15 @@ services:
     ports:
       - "8080:8080"
 
+  asset-frontend:
+    build:
+      context: ./frontend/asset-frontend
+      dockerfile: Dockerfile
+    container_name: asset-frontend
+    depends_on:
+      - asset-backend
+    ports:
+      - "80:80"
+
 volumes:
   db_data:
-
