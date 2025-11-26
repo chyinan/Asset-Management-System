@@ -1,4 +1,4 @@
-RHTTPS://HP-STATIC.COOCARE.COM/DOWNLOAD/DOWNLOAversion: "3.9"
+version: "3.9"
 
 services:
   mysql:
