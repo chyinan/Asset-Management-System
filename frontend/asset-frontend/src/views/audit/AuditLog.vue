@@ -131,7 +131,7 @@ const dateRange = computed<DateRange>({
     }
     return null
   },
-  set: (val: DateRange) => {
+  set: (val: DateRange | null) => {
     if (val) {
       filterStart.value = val[0]
       filterEnd.value = val[1]
