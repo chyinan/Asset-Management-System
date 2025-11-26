@@ -43,7 +43,7 @@
           <template #default="{ row }">
             <el-space wrap>
               <el-tag v-for="item in row.items" :key="item.id" size="small">
-                {{ item.assetTypeId }} x{{ item.quantity }}
+                {{ item.assetTypeName || item.assetTypeId }} x{{ item.quantity }}
               </el-tag>
             </el-space>
           </template>
@@ -66,7 +66,7 @@
             <p class="remark-text">{{ row.remark || '无备注' }}</p>
             <div class="item-tags">
               <el-tag v-for="item in row.items" :key="item.id" size="small" type="info">
-                {{ item.assetTypeId }} x{{ item.quantity }}
+                {{ item.assetTypeName || item.assetTypeId }} x{{ item.quantity }}
               </el-tag>
             </div>
           </div>
@@ -456,4 +456,3 @@ onMounted(() => {
   }
 }
 </style>
-

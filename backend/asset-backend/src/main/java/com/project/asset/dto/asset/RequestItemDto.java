@@ -14,10 +14,11 @@ public class RequestItemDto {
 
     @NotNull
     private Long assetTypeId;
+    
+    private String assetTypeName;
 
     @Min(1)
     private Integer quantity;
 
     private String purpose;
 }
-

@@ -23,6 +23,7 @@ export interface Vendor {
 export interface AssetRequestItem {
   id?: number
   assetTypeId: number
+  assetTypeName?: string
   quantity: number
   purpose?: string
 }
@@ -63,4 +64,3 @@ export interface AuditLog {
   detail?: string
   createdAt: string
 }
-

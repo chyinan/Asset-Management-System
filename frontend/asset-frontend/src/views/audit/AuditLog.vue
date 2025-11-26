@@ -58,7 +58,7 @@
 
     <div class="table-shell surface-card">
       <!-- Desktop Table -->
-      <el-table v-if="!isMobile && filteredLogs.length" :data="filteredLogs" v-loading="loading" height="520">
+      <el-table v-if="!isMobile" :data="filteredLogs" v-loading="loading" height="520">
         <el-table-column label="时间" width="190">
           <template #default="{ row }">
             {{ formatDate(row.createdAt) }}
@@ -92,7 +92,7 @@
       </div>
 
       <el-skeleton v-else-if="loading" :rows="8" animated />
-      <el-empty v-else description="暂无审计日志" />
+      <el-empty v-else-if="!loading && filteredLogs.length === 0" description="暂无审计日志" />
       <el-pagination
         class="mt-16"
         :layout="isMobile ? 'prev, pager, next' : 'total, prev, pager, next'"
@@ -120,6 +120,7 @@ type DateRange = [Date, Date] | null
 const logs = ref<AuditLog[]>([])
 const loading = ref(false)
 const keyword = ref('')
+const actionFilter = ref<string>('') // Fix: Initialize as empty string
 const filterStart = ref<Date | null>(null)
 const filterEnd = ref<Date | null>(null)
 
@@ -370,4 +371,3 @@ onMounted(fetchData)
   }
 }
 </style>
-

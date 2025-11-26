@@ -9,3 +9,4 @@ ALTER TABLE inventory
     ADD CONSTRAINT fk_inventory_current_holder FOREIGN KEY (current_holder_id) REFERENCES users(id);
 
 
+

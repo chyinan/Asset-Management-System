@@ -151,6 +151,7 @@ public class AssetRequestService {
                         .map(item -> RequestItemDto.builder()
                                 .id(item.getId())
                                 .assetTypeId(item.getAssetType() != null ? item.getAssetType().getId() : null)
+                                .assetTypeName(item.getAssetType() != null ? item.getAssetType().getName() : null)
                                 .quantity(item.getQuantity())
                                 .purpose(item.getPurpose())
                                 .build())
