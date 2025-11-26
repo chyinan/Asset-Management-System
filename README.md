@@ -4,7 +4,7 @@
 
 ### 技术栈
 
-- **后端**：Spring Boot 3.4、Spring Security、JJWT、Spring Data JPA、Flyway、MySQL
+- **后端**：Spring Boot 3.4、Spring Security、JJWT、Spring Data JPA、Flyway、MySQL、Spring Mail (JavaMailSender)
 - **前端**：Vue 3 + Vite + TypeScript + Element Plus + Pinia + Vue Router
 - **测试**：JUnit 5、MockMvc、Vue TSC
 - **其他**：OpenAPI(Swagger UI)、Docker、GitHub Actions
@@ -94,6 +94,7 @@ npm run build
 - JJWT + Spring Security 实现 access/refresh token，支持刷新、权限点注解（`@PreAuthorize`）
 - RBAC 权限模型（用户-角色-权限），前后端均支持按钮/路由级别的权限控制
 - 资产生命周期 API（申请/审批/入库/领用/归还）+ 审批记录 + 审计日志
+- **(New) 资产归还提醒**：可配置 SMTP 邮箱服务、自定义提醒频率（Cron）及提前提醒天数，自动发送邮件提醒即将到期或已逾期的资产。
 - 统一响应结构 `{code,message,data}`、全局异常处理、参数校验、分页/排序
 - Flyway 数据库迁移 + 种子数据
 - Swagger UI (`/swagger-ui.html`) + Postman/Insomnia 示例
@@ -133,14 +134,16 @@ npm run build
 
 后端（`application.yml` 支持读取）：
 
-| 变量                   | 默认值                                              |
-|-----------------------|-----------------------------------------------------|
-| `DB_URL`              | `jdbc:mysql://localhost:3306/asset?...`             |
-| `DB_USERNAME`         | `root`                                              |
-| `DB_PASSWORD`         | `123456`                                            |
-| `JWT_SECRET`          | `popcap`                                            |
-| `JWT_ACCESS_EXPIRATION` | `3600`（秒）                                      |
-| `JWT_REFRESH_EXPIRATION`| `604800`（秒）                                    |
+| 变量                   | 默认值                                              | 说明 |
+|-----------------------|-----------------------------------------------------|---|
+| `DB_URL`              | `jdbc:mysql://localhost:3306/asset?...`             | |
+| `DB_USERNAME`         | `root`                                              | |
+| `DB_PASSWORD`         | `123456`                                            | |
+| `JWT_SECRET`          | `popcap`                                            | |
+| `JWT_ACCESS_EXPIRATION` | `3600`（秒）                                      | |
+| `JWT_REFRESH_EXPIRATION`| `604800`（秒）                                    | |
+| `ASSET_LOAN_REMINDER_ENABLED` | `true` | 是否开启归还提醒任务 |
+| `ASSET_LOAN_REMINDER_CRON` | `0 0 9 ? * MON` | 默认提醒任务 Cron 表达式 |
 
 前端（`env.example`）：
 
@@ -195,6 +198,8 @@ POST /api/inventory/stock-in
 POST /api/inventory/{id}/checkout
 POST /api/inventory/{id}/return
 GET  /api/audit-logs
+GET  /api/system/reminder-settings # 获取提醒配置
+PUT  /api/system/reminder-settings # 更新提醒配置
 ```
 
 更多请参阅 Swagger UI。
@@ -208,4 +213,3 @@ GET  /api/audit-logs
 3. 若需要进一步扩展，可增加采购模块、报废流程、Redis 刷新 token 黑名单等。
 
 欢迎根据业务需求继续完善。Enjoy! 🎉
-
