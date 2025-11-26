@@ -112,7 +112,7 @@ npm run build
 - Swagger UI (`/swagger-ui.html`) + Postman/Insomnia 示例
 - 单元测试（UserService、JwtTokenProvider）+ Integration Test（完整流程）
 - Vue3 + Element Plus 前端：登录、仪表盘、申请管理、库存操作、系统管理、审计日志
-- Dockerfile（后端）、docker-compose（后端 + MySQL），演示部署
+- Docker前后端一键部署支持
 
 ---
 
